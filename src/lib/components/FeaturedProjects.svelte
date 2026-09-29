@@ -6,25 +6,25 @@
 		{
 			title: 'Pallora',
 			year: '2026',
-			image: 'https://thesadzzad.vercel.app/_next/image?url=%2Fpallora.webp&w=3840&q=75',
+			image: 'https://thesadzzad.vercel.app/_next/image?url=%2Fpallora.webp&w=1600&q=75',
 			href: 'https://palora-eight.vercel.app/'
 		},
 		{
 			title: 'AllCloths',
 			year: '2026',
-			image: 'https://thesadzzad.vercel.app/_next/image?url=%2Fallcloths.webp&w=3840&q=75',
+			image: 'https://thesadzzad.vercel.app/_next/image?url=%2Fallcloths.webp&w=1600&q=75',
 			href: 'https://www.allcloths.com/'
 		},
 		{
 			title: 'Maplelingua',
 			year: '2026',
-			image: 'https://thesadzzad.vercel.app/_next/image?url=%2Fmaplelingua.webp&w=3840&q=75',
+			image: 'https://thesadzzad.vercel.app/_next/image?url=%2Fmaplelingua.webp&w=1600&q=75',
 			href: 'https://www.maplelingua.com/'
 		},
 		{
 			title: 'Malyam',
 			year: '2026',
-			image: 'https://thesadzzad.vercel.app/_next/image?url=%2Fmalyam.webp&w=3840&q=75',
+			image: 'https://thesadzzad.vercel.app/_next/image?url=%2Fmalyam.webp&w=1600&q=75',
 			href: 'https://malyam.com/'
 		},
 		{
@@ -42,9 +42,102 @@
 			demo: true
 		}
 	];
+	const storyBeats = [
+		{ label: '01 / HELLO', text: 'Hello.' },
+		{ label: '02 / WHO I AM', text: 'I am Khandakar Sadzzad Hossain Fahim.' },
+		{
+			label: '03 / WHAT I DO',
+			text: 'A developer bringing ideas to life through clear interfaces, expressive motion, and playful 3D.'
+		}
+	];
+	const skillGroups = [
+		{
+			name: 'Languages',
+			skills: ['Python', 'C', 'Rust', 'C++', 'JavaScript', 'TypeScript', 'CSS', 'HTML']
+		},
+		{
+			name: 'Frameworks & graphics',
+			skills: [
+				'React',
+				'Vue',
+				'Svelte',
+				'Tailwind CSS',
+				'Three.js',
+				'WebGL',
+				'3D web games',
+				'Anime.js',
+				'GSAP',
+				'CSS animation'
+			]
+		},
+		{
+			name: 'AI & workflows',
+			skills: [
+				'AI-assisted development',
+				'Prompt design',
+				'LLM workflows',
+				'Automation',
+				'Model fine-tuning'
+			]
+		},
+		{ name: 'Tools', skills: ['Figma', 'GitHub', 'Docker', 'Git'] },
+		{
+			name: 'Data & backend',
+			skills: ['MySQL', 'SQLite', 'MongoDB', 'PostgreSQL', 'Firebase', 'Supabase', 'SurrealDB']
+		}
+	];
+	const beatCount = storyBeats.length + skillGroups.length;
+	const revealDistanceVh = 25;
+	const holdDistanceVh = 75;
+	const beatStepVh = revealDistanceVh + holdDistanceVh;
+	const storyScrollVh = beatCount * revealDistanceVh + (beatCount - 1) * holdDistanceVh;
+	const fadeDuration = 0.2;
+	const clamp = (value: number) => Math.max(0, Math.min(1, value));
+	const beatProgress = (beatIndex: number) =>
+		(aboutProgress - beatIndex * beatStepVh) / revealDistanceVh;
+
+	function characterStyle(beatIndex: number, characterIndex: number, characterCount: number) {
+		const progress = beatProgress(beatIndex);
+		const stagger = (characterIndex / Math.max(1, characterCount - 1)) * 0.2;
+		const enter = clamp((progress - stagger) / 0.8);
+		const exit = clamp((progress - beatStepVh / revealDistanceVh) / fadeDuration);
+		const opacity = enter * (1 - exit);
+		const y = (1 - enter) * 34 - exit * 24;
+		const rotateX = (1 - enter) * 62 - exit * 42;
+		const centerOffset = (characterIndex - (characterCount - 1) / 2) / Math.max(1, characterCount);
+		const rotateY = (1 - enter) * centerOffset * 100;
+		const scale = 0.86 + enter * 0.14 - exit * 0.06;
+
+		return `--char-opacity:${opacity};--char-transform:translate3d(0,${y}px,-${(1 - enter) * 36}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${scale})`;
+	}
+
+	function beatStyle(beatIndex: number) {
+		const progress = beatProgress(beatIndex);
+		const enter = clamp(progress / fadeDuration);
+		const exit = clamp((progress - beatStepVh / revealDistanceVh) / fadeDuration);
+		const opacity = enter * (1 - exit);
+		const y = (1 - enter) * 18 - exit * 18;
+		const rotateX = (1 - enter) * 5 - exit * 5;
+		const scale = 0.98 + enter * 0.02 - exit * 0.02;
+
+		return `--beat-opacity:${opacity};--beat-transform:translate3d(0,${y}px,0) rotateX(${rotateX}deg) scale(${scale})`;
+	}
+
+	function skillStyle(beatIndex: number, skillIndex: number, skillTotal: number) {
+		const progress = beatProgress(beatIndex);
+		const stagger = (skillIndex / Math.max(1, skillTotal - 1)) * 0.2;
+		const enter = clamp((progress - stagger) / 0.8);
+		const exit = clamp((progress - beatStepVh / revealDistanceVh) / fadeDuration);
+		const opacity = enter * (1 - exit);
+
+		return `--skill-opacity:${opacity};--skill-transform:translate3d(0,${(1 - enter) * 20 - exit * 12}px,${(1 - enter) * -28}px) rotateX(${(1 - enter) * 38 - exit * 28}deg) scale(${0.9 + enter * 0.1 - exit * 0.04})`;
+	}
 
 	let active = $state(0);
 	let gallery: HTMLDivElement;
+	let aboutStage: HTMLDivElement;
+	let aboutProgress = $state(0);
+	let storyPinned = $state(false);
 	let animations: { cancel: () => void }[] = [];
 
 	function selectProject(index: number) {
@@ -95,8 +188,75 @@
 
 	onMount(() => {
 		let frame = 0;
+		let unlockTimer = 0;
+		let touchStartY: number | undefined;
+		let storyTransitioning = false;
+		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+		const isStoryPinned = () => {
+			if (reducedMotion.matches) return false;
+			const { top, bottom } = aboutStage.getBoundingClientRect();
+			return top <= 1 && bottom >= window.innerHeight - 1;
+		};
+		const goToStoryPosition = (direction: -1 | 1) => {
+			if (storyTransitioning) return;
+			storyTransitioning = true;
+			window.clearTimeout(unlockTimer);
+			unlockTimer = window.setTimeout(() => (storyTransitioning = false), 1000);
+
+			const rect = aboutStage.getBoundingClientRect();
+			const start = window.scrollY + rect.top;
+			const travel = aboutStage.offsetHeight - window.innerHeight;
+			const current = Math.max(0, Math.min(beatCount - 1, Math.round(aboutProgress / beatStepVh)));
+			let target: number;
+
+			if (direction > 0 && current === beatCount - 1) {
+				target =
+					aboutProgress < storyScrollVh - 1
+						? start + travel
+						: start + travel + window.innerHeight * 0.35;
+			} else if (direction < 0 && current === 0) {
+				target = Math.max(0, start - window.innerHeight * 0.35);
+			} else {
+				const targetProgress = (current + direction) * beatStepVh;
+				target = start + (targetProgress / storyScrollVh) * travel;
+			}
+
+			window.scrollTo({
+				top: target,
+				behavior: reducedMotion.matches ? 'auto' : 'smooth'
+			});
+		};
+		const onWheel = (event: WheelEvent) => {
+			if (!isStoryPinned() || event.ctrlKey || Math.abs(event.deltaY) < 2) return;
+			event.preventDefault();
+			goToStoryPosition(event.deltaY > 0 ? 1 : -1);
+		};
+		const onTouchStart = (event: TouchEvent) => {
+			touchStartY =
+				isStoryPinned() && event.touches.length === 1 ? event.touches[0].clientY : undefined;
+		};
+		const onTouchEnd = (event: TouchEvent) => {
+			if (touchStartY === undefined) return;
+			const distance = touchStartY - event.changedTouches[0].clientY;
+			touchStartY = undefined;
+			if (isStoryPinned() && Math.abs(distance) >= 32) {
+				goToStoryPosition(distance > 0 ? 1 : -1);
+			}
+		};
+		const onTouchCancel = () => (touchStartY = undefined);
+		const onScrollEnd = () => {
+			if (!storyTransitioning) return;
+			window.clearTimeout(unlockTimer);
+			unlockTimer = window.setTimeout(() => (storyTransitioning = false), 120);
+		};
 		const updateFromScroll = () => {
 			frame = 0;
+			const rect = aboutStage.getBoundingClientRect();
+			const travel = aboutStage.offsetHeight - window.innerHeight;
+			storyPinned =
+				!reducedMotion.matches && rect.top <= 1 && rect.bottom >= window.innerHeight - 1;
+			const progress = travel > 0 ? clamp(-rect.top / travel) : 1;
+			aboutProgress = progress * storyScrollVh;
 			if (window.innerWidth > 700 || !gallery) return;
 
 			const panels = Array.from(gallery.children) as HTMLElement[];
@@ -122,18 +282,97 @@
 
 		window.addEventListener('scroll', onScroll, { passive: true });
 		window.addEventListener('resize', resetDesktopHeights);
+		window.addEventListener('scrollend', onScrollEnd);
+		aboutStage.addEventListener('wheel', onWheel, { passive: false });
+		aboutStage.addEventListener('touchstart', onTouchStart, { passive: true });
+		aboutStage.addEventListener('touchend', onTouchEnd, { passive: true });
+		aboutStage.addEventListener('touchcancel', onTouchCancel, { passive: true });
 		onScroll();
 		return () => {
 			cancelAnimationFrame(frame);
+			window.clearTimeout(unlockTimer);
 			window.removeEventListener('scroll', onScroll);
 			window.removeEventListener('resize', resetDesktopHeights);
+			window.removeEventListener('scrollend', onScrollEnd);
+			aboutStage.removeEventListener('wheel', onWheel);
+			aboutStage.removeEventListener('touchstart', onTouchStart);
+			aboutStage.removeEventListener('touchend', onTouchEnd);
+			aboutStage.removeEventListener('touchcancel', onTouchCancel);
 			animations.forEach((animation) => animation.cancel());
 		};
 	});
 </script>
 
 <section class="projects" aria-labelledby="projects-title">
-	<header class="projects__intro">
+	<div
+		id="about"
+		class="projects__about"
+		bind:this={aboutStage}
+		style={`--story-stage-height: calc(100svh + ${storyScrollVh}svh)`}
+		role="region"
+		aria-label="About Khandakar Sadzzad Hossain Fahim"
+	>
+		<div class:story-pinned={storyPinned} class="projects__about-copy">
+			<div class="projects__story-stage">
+				{#each storyBeats as beat, beatIndex (beat.label)}
+					<div
+						class={`projects__story-beat ${beatIndex === 0 ? 'projects__story-beat--hello' : ''} ${beatIndex === 1 ? 'projects__story-beat--name' : ''}`}
+						style={beatStyle(beatIndex)}
+					>
+						<span class="projects__story-label">{beat.label}</span>
+						<h2 class="projects__story-title" aria-label={beat.text}>
+							{#each beat.text.split(' ') as word, wordIndex (`${beatIndex}-${wordIndex}`)}
+								{@const characters = Array.from(word)}
+								<span class="projects__story-word" aria-hidden="true">
+									{#each characters as character, characterIndex (`${wordIndex}-${characterIndex}`)}
+										<span
+											class="projects__story-character"
+											style={characterStyle(beatIndex, characterIndex, characters.length)}
+											>{character}</span
+										>
+									{/each}
+								</span>{' '}
+							{/each}
+						</h2>
+					</div>
+				{/each}
+
+				{#each skillGroups as group, groupIndex (group.name)}
+					{@const beatIndex = storyBeats.length + groupIndex}
+					<div
+						class="projects__story-beat projects__story-beat--skills"
+						style={beatStyle(beatIndex)}
+					>
+						<span class="projects__story-label"
+							>{String(beatIndex + 1).padStart(2, '0')} / SKILLSET</span
+						>
+						<div class="projects__skill-heading">
+							<h2 aria-label={group.name}>
+								{#each group.name.split(' ') as word, wordIndex (`${groupIndex}-${wordIndex}`)}
+									{@const characters = Array.from(word)}
+									<span class="projects__story-word" aria-hidden="true">
+										{#each characters as character, characterIndex (`${wordIndex}-${characterIndex}`)}
+											<span
+												class="projects__story-character"
+												style={characterStyle(beatIndex, characterIndex, characters.length)}
+												>{character}</span
+											>
+										{/each}
+									</span>{' '}
+								{/each}
+							</h2>
+						</div>
+						<ul class="projects__skill-list" aria-label={`${group.name} skills`}>
+							{#each group.skills as skill, skillIndex (skill)}
+								<li style={skillStyle(beatIndex, skillIndex, group.skills.length)}>{skill}</li>
+							{/each}
+						</ul>
+					</div>
+				{/each}
+			</div>
+		</div>
+	</div>
+	<header id="works" class="projects__intro">
 		<h2 id="projects-title">Featured Projects</h2>
 	</header>
 	<div class="projects__gallery" aria-label="Featured projects" bind:this={gallery}>
@@ -158,7 +397,12 @@
 						rel="external noreferrer"
 						aria-label={`Visit ${project.title}${project.demo ? ' demo on GitHub' : ''}`}
 					>
-						<img src={project.image} alt="" loading={index < 2 ? 'eager' : 'lazy'} />
+						<img
+							src={project.image}
+							alt=""
+							loading={index === 0 ? 'eager' : 'lazy'}
+							decoding="async"
+						/>
 					</a>
 				{/if}
 				<div class="projects__label">
@@ -202,6 +446,120 @@
 		font-size: clamp(32px, 5vw, 56px);
 		font-weight: 700;
 		letter-spacing: -0.06em;
+	}
+	.projects__about {
+		min-height: var(--story-stage-height);
+		margin-top: clamp(1rem, 3svh, 2rem);
+		padding: 0 24px;
+	}
+	.projects__about-copy {
+		position: sticky;
+		top: 0;
+		display: grid;
+		place-items: center;
+		width: 100%;
+		height: 100svh;
+		margin: 0 auto;
+		overflow: hidden;
+	}
+	.projects__about-copy.story-pinned {
+		touch-action: pan-x pinch-zoom;
+	}
+	.projects__story-stage {
+		position: relative;
+		display: grid;
+		place-items: center;
+		width: 100%;
+		height: 100%;
+		perspective: 900px;
+		transform-style: preserve-3d;
+	}
+	.projects__story-beat {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: clamp(18px, 3vh, 32px);
+		padding: clamp(12px, 4vw, 64px);
+		backface-visibility: hidden;
+		opacity: var(--beat-opacity, 0);
+		transform: var(--beat-transform, none);
+		transform-style: preserve-3d;
+		will-change: opacity, transform;
+		text-align: center;
+	}
+	.projects__story-label {
+		display: block;
+		margin: 0;
+		color: var(--color-muted);
+		font-family: var(--font-mono);
+		font-size: clamp(10px, 0.8vw, 12px);
+		font-weight: 500;
+		letter-spacing: 0.1em;
+		line-height: 1.2;
+	}
+	.projects__story-title,
+	.projects__skill-heading h2 {
+		margin: 0;
+		font-family: var(--font-sans);
+		font-size: clamp(38px, 7vw, 96px);
+		font-weight: 650;
+		letter-spacing: -0.075em;
+		line-height: 0.98;
+		text-wrap: balance;
+	}
+	.projects__story-beat--hello .projects__story-title {
+		font-size: clamp(72px, 15vw, 190px);
+		letter-spacing: -0.09em;
+	}
+	.projects__story-beat--name .projects__story-title {
+		max-width: 1100px;
+		font-size: clamp(42px, 7.5vw, 104px);
+	}
+	.projects__story-word {
+		display: inline-block;
+		white-space: nowrap;
+	}
+	.projects__story-character {
+		display: inline-block;
+		backface-visibility: hidden;
+		opacity: var(--char-opacity, 0);
+		transform: var(--char-transform);
+		transform-origin: center bottom;
+		transform-style: preserve-3d;
+	}
+	.projects__story-beat--skills {
+		gap: clamp(20px, 4vh, 40px);
+	}
+	.projects__skill-heading {
+		text-align: center;
+	}
+	.projects__skill-heading h2 {
+		font-size: clamp(36px, 6vw, 76px);
+	}
+	.projects__skill-list {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: clamp(8px, 1.2vw, 14px);
+		width: min(100%, 1000px);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.projects__skill-list li {
+		padding: 9px 14px;
+		border: 1px solid var(--color-line);
+		border-radius: 999px;
+		color: var(--color-muted);
+		font-family: var(--font-mono);
+		font-size: clamp(10px, 1vw, 13px);
+		letter-spacing: 0;
+		line-height: 1.1;
+		opacity: var(--skill-opacity, 0);
+		transform: var(--skill-transform);
 	}
 	.projects__gallery {
 		display: flex;
@@ -331,16 +689,46 @@
 		.projects__intro {
 			padding: 3.5rem 16px 2rem;
 		}
+		.projects__about {
+			padding: 0 20px;
+		}
+		.projects__about-copy {
+			padding: 0;
+		}
+		.projects__story-beat {
+			gap: 22px;
+			padding: 16px;
+		}
+		.projects__story-label {
+			font-size: 9px;
+		}
+		.projects__story-title {
+			font-size: clamp(34px, 9vw, 58px);
+		}
+		.projects__story-beat--hello .projects__story-title {
+			font-size: clamp(68px, 19vw, 120px);
+		}
+		.projects__story-beat--name .projects__story-title {
+			font-size: clamp(35px, 9.5vw, 58px);
+		}
+		.projects__story-beat--skills {
+			gap: 24px;
+		}
+		.projects__skill-heading h2 {
+			font-size: clamp(30px, 8vw, 48px);
+		}
+		.projects__skill-list {
+			gap: 7px;
+		}
+		.projects__skill-list li {
+			padding: 8px 11px;
+			font-size: 10px;
+		}
 		.projects__gallery {
 			height: auto;
 			min-height: 0;
 			flex-direction: column;
 			overflow: visible;
-		}
-		.projects__gallery::after {
-			flex: none;
-			height: calc(100svh - clamp(130px, 18svh, 160px));
-			content: '';
 		}
 		.projects__panel,
 		.projects__panel.active {
@@ -390,6 +778,40 @@
 		}
 	}
 	@media (prefers-reduced-motion: reduce) {
+		.projects__about {
+			min-height: auto;
+		}
+		.projects__about-copy {
+			position: relative;
+			height: auto;
+			overflow: visible;
+		}
+		.projects__story-stage {
+			display: flex;
+			flex-direction: column;
+			gap: 36px;
+			height: auto;
+			perspective: none;
+		}
+		.projects__story-beat {
+			position: relative;
+			inset: auto;
+			width: 100%;
+			min-height: 60svh;
+			opacity: 1;
+			transform: none;
+			will-change: auto;
+		}
+		.projects__story-character,
+		.projects__skill-list li {
+			opacity: 1;
+			transform: none;
+			transition: none;
+		}
+		.projects__story-beat--skills {
+			min-height: 50svh;
+			opacity: 1;
+		}
 		.projects__panel,
 		.projects__image img,
 		.projects__toggle {

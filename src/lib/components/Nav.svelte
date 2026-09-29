@@ -33,9 +33,9 @@
 <nav class="w-[min(90vw,500px)] px-4" aria-label="Main navigation">
 	<div class="flex min-h-[68px] items-center justify-between gap-3 max-[700px]:min-h-[56px]">
 		<a
-			class="grid size-10 shrink-0 place-items-center rounded-full bg-coral text-[22px] leading-none text-[#fffaf2] outline-offset-4 focus-visible:outline-2 focus-visible:outline-coral max-[700px]:size-9 max-[700px]:text-xl max-[360px]:size-8 max-[360px]:text-lg"
+			class="grid size-10 shrink-0 place-items-center rounded-lg bg-coral font-sans text-[22px] leading-none font-bold text-[#fffaf2] outline-offset-4 focus-visible:outline-2 focus-visible:outline-coral max-[700px]:size-9 max-[700px]:text-xl max-[360px]:size-8 max-[360px]:text-lg"
 			href="#home"
-			aria-label="Home"><span aria-hidden="true">✳</span></a
+			aria-label="Home"><span aria-hidden="true">K</span></a
 		>
 		<div class="ml-auto flex items-center gap-2">
 			{#if hasSong}
@@ -111,18 +111,10 @@
 					onclick={() => setMenu(false)}>Works</a
 				>
 				<a
-					class="block rounded-lg px-4 py-3 text-sm font-semibold text-coral transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-coral"
+					class="block rounded-lg px-4 py-3 text-sm font-semibold text-paper transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-coral"
 					href="#contact"
-					onclick={() => setMenu(false)}>Let’s talk <span aria-hidden="true">↗</span></a
+					onclick={() => setMenu(false)}>Let’s talk</a
 				>
-				<p class="px-4 pt-2 font-mono text-[9px] text-paper/50">
-					Audio control inspired by <a
-						class="underline underline-offset-2"
-						href="https://skiper-ui.com/v1/skiper25"
-						target="_blank"
-						rel="noreferrer">Skiper UI</a
-					>
-				</p>
 			</div>
 		</div>
 	</div>
