@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { addCorners, unobserve } from '@monokai/monoco';
 	import DynamicIsland from '$lib/components/DynamicIsland.svelte';
+	import Intro from '$lib/components/Intro.svelte';
 	import Nav from '$lib/components/Nav.svelte';
+
+	let introComplete = $state(false);
 
 	function squircle(node: HTMLElement, borderRadius: number) {
 		addCorners(node, { borderRadius, smoothing: 1, clip: true });
@@ -17,8 +20,12 @@
 	/>
 </svelte:head>
 
+<Intro onComplete={() => (introComplete = true)} />
+
 <main class="mx-auto w-[min(1180px,calc(100%_-_80px))] max-[700px]:w-[min(100%_-_40px,500px)]">
-	<DynamicIsland><Nav /></DynamicIsland>
+	{#if introComplete}
+		<DynamicIsland><Nav /></DynamicIsland>
+	{/if}
 
 	<section
 		class="grid min-h-[100svh] grid-cols-1 items-center gap-0 py-[110px] pb-[50px] md:grid-cols-[1fr_1.05fr] md:gap-[5%] max-[700px]:gap-0 max-[700px]:py-[115px] max-[700px]:pb-[35px]"
