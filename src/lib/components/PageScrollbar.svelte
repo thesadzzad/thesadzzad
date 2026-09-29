@@ -72,7 +72,7 @@
 </script>
 
 {#if maxScroll > 0}
-	<div class="fixed right-6 bottom-6 z-50 h-10 w-[min(314px,calc(100vw-32px))] rounded-full bg-white shadow-[0_4px_18px_rgb(40_41_33_/_12%)]">
+	<div class="fixed top-1/2 right-[calc(2rem-157px)] z-50 hidden h-10 w-[min(314px,calc(100vw-32px))] -translate-y-1/2 rotate-90 rounded-full bg-white shadow-[0_4px_18px_rgb(40_41_33_/_12%)] md:block">
 		<div
 			class="pointer-events-none absolute top-[13px] right-5 bottom-[13px] left-8 bg-[repeating-linear-gradient(90deg,#a8a79f_0_1px,transparent_1px_6px)]"
 			aria-hidden="true"
@@ -97,8 +97,8 @@
 	}
 
 	.page-scroll-range::-webkit-slider-thumb {
-		width: 24px;
-		height: 6px;
+		width: 6px;
+		height: 24px;
 		appearance: none;
 		border: 0;
 		border-radius: 999px;
@@ -111,8 +111,8 @@
 	}
 
 	.page-scroll-range::-moz-range-thumb {
-		width: 24px;
-		height: 6px;
+		width: 6px;
+		height: 24px;
 		border: 0;
 		border-radius: 999px;
 		background: var(--color-coral);
