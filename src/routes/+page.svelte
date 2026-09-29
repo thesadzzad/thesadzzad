@@ -18,7 +18,7 @@
 
 <Intro onComplete={() => (introComplete = true)} />
 
-<main class="grid min-h-svh w-full place-items-center overflow-hidden">
+<main class="relative min-h-svh w-full">
 	{#if introComplete}
 		<DynamicIsland onComplete={() => (islandComplete = true)}><Nav /></DynamicIsland>
 	{/if}

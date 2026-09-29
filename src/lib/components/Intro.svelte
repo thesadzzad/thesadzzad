@@ -26,14 +26,27 @@
 	async function continueToHome() {
 		if (exiting) return;
 		exiting = true;
+		const introSong = new Audio('/intro_song.mp3');
+		introSong.volume = 0;
+		void introSong.play().catch(() => {});
+		animate(introSong, { volume: 0.7, duration: 3000, ease: 'inCubic' });
 		// Let the current orbit step finish so its greeting reaches the top-center stop.
 		await orbitAnimation?.then();
 		labelAnimation?.pause();
 		await new Promise((resolve) => setTimeout(resolve, 500));
 		await Promise.all([
-			animate(curtain!, { translateY: -window.innerHeight * 1.25, duration: 950, ease: 'inOutCubic' }).then(),
+			animate(curtain!, {
+				translateY: -window.innerHeight * 1.25,
+				duration: 950,
+				ease: 'inOutCubic'
+			}).then(),
 			animate(orbit!, { translateY: -24, opacity: [1, 0], duration: 360, ease: 'inQuad' }).then(),
-			animate(continueButton!, { translateY: -12, opacity: [1, 0], duration: 300, ease: 'inQuad' }).then()
+			animate(continueButton!, {
+				translateY: -12,
+				opacity: [1, 0],
+				duration: 300,
+				ease: 'inQuad'
+			}).then()
 		]);
 		visible = false;
 		onComplete();
@@ -90,7 +103,6 @@
 				await labelAnimation.then();
 				await new Promise((resolve) => setTimeout(resolve, 500));
 			}
-
 		}
 
 		void play();
@@ -106,14 +118,15 @@
 			preserveAspectRatio="none"
 			aria-hidden="true"
 		>
-			<path d="M0 0H100V100Q50 125 0 100Z" fill="#e9e3d7" />
+			<path class="max-[700px]:hidden" d="M0 0H100V100Q50 125 0 100Z" fill="#e9e3d7" />
+			<path class="hidden max-[700px]:block" d="M0 0H100V100Q50 108 0 100Z" fill="#e9e3d7" />
 		</svg>
 		<div
 			class="absolute top-1/2 left-1/2 h-[160svh] w-[240svh] -translate-x-1/2 overflow-visible rounded-[50%] bg-transparent"
 		>
 			<svg
 				bind:this={orbit}
-				class="absolute inset-0 size-full overflow-visible [transform-box:fill-box] [transform-origin:center]"
+				class="absolute inset-0 size-full [transform-origin:center] overflow-visible [transform-box:fill-box]"
 				viewBox="0 0 1500 1000"
 				aria-hidden="true"
 			>
@@ -121,8 +134,18 @@
 					<path id="intro-orbit" d="M 750 1000 A 750 500 0 0 1 750 0 A 750 500 0 0 1 750 1000" />
 				</defs>
 				{#each greetings as word, index}
-					<text fill="#282921" font-family="DM Sans, sans-serif" font-size="38" font-weight="700" letter-spacing="1">
-						<textPath href="#intro-orbit" startOffset={`${(50 - index * orbitStep + 100) % 100}%`} text-anchor="middle">{word.toUpperCase()}</textPath>
+					<text
+						fill="#282921"
+						font-family="DM Sans, sans-serif"
+						font-size="38"
+						font-weight="700"
+						letter-spacing="1"
+					>
+						<textPath
+							href="#intro-orbit"
+							startOffset={`${(50 - index * orbitStep + 100) % 100}%`}
+							text-anchor="middle">{word.toUpperCase()}</textPath
+						>
 					</text>
 				{/each}
 			</svg>
