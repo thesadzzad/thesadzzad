@@ -3,7 +3,7 @@
 	import { onMount, tick } from 'svelte';
 	import { addCorners, unobserve } from '@monokai/monoco';
 
-	let { children } = $props();
+	let { children, onComplete = () => {} } = $props();
 	let island = $state<HTMLDivElement>();
 	let greeting = $state<HTMLDivElement>();
 	let nav = $state<HTMLDivElement>();
@@ -20,6 +20,7 @@
 
 		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 			showNav = true;
+			onComplete();
 			return;
 		}
 
@@ -47,6 +48,7 @@
 		animate(nav, { opacity: [0, 1], translateY: [-6, 0], duration: 360, ease: 'outQuad' });
 		await expand.then();
 		islandWidth = undefined;
+		onComplete();
 	});
 </script>
 

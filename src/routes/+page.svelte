@@ -2,8 +2,10 @@
 	import DynamicIsland from '$lib/components/DynamicIsland.svelte';
 	import Intro from '$lib/components/Intro.svelte';
 	import Nav from '$lib/components/Nav.svelte';
+	import WordRotation from '$lib/components/WordRotation.svelte';
 
 	let introComplete = $state(false);
+	let islandComplete = $state(false);
 </script>
 
 <svelte:head>
@@ -16,8 +18,11 @@
 
 <Intro onComplete={() => (introComplete = true)} />
 
-<main class="min-h-svh">
+<main class="grid min-h-svh w-full place-items-center overflow-hidden">
 	{#if introComplete}
-		<DynamicIsland><Nav /></DynamicIsland>
+		<DynamicIsland onComplete={() => (islandComplete = true)}><Nav /></DynamicIsland>
+	{/if}
+	{#if islandComplete}
+		<WordRotation />
 	{/if}
 </main>

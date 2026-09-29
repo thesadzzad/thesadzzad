@@ -97,8 +97,8 @@
 	}
 
 	.page-scroll-range::-webkit-slider-thumb {
-		width: 6px;
-		height: 24px;
+		width: 24px;
+		height: 6px;
 		appearance: none;
 		border: 0;
 		border-radius: 999px;
@@ -111,8 +111,8 @@
 	}
 
 	.page-scroll-range::-moz-range-thumb {
-		width: 6px;
-		height: 24px;
+		width: 24px;
+		height: 6px;
 		border: 0;
 		border-radius: 999px;
 		background: var(--color-coral);
