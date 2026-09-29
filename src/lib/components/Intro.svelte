@@ -3,7 +3,10 @@
 	import { addCorners, unobserve } from '@monokai/monoco';
 	import { onMount } from 'svelte';
 
-	let { onComplete }: { onComplete: () => void } = $props();
+	let {
+		onComplete,
+		onSongStart
+	}: { onComplete: () => void; onSongStart: (song: HTMLAudioElement) => void } = $props();
 	const greetings = ['Hello', 'Hola', 'Bonjour', 'Ciao', 'こんにちは'];
 	const continueWords = ['Continue', 'Continuar', 'Continuer', 'Continua', '続ける'];
 	const orbitStep = 100 / greetings.length;
@@ -28,6 +31,7 @@
 		exiting = true;
 		const introSong = new Audio('/intro_song.mp3');
 		introSong.volume = 0;
+		onSongStart(introSong);
 		void introSong.play().catch(() => {});
 		animate(introSong, { volume: 0.7, duration: 3000, ease: 'inCubic' });
 		// Let the current orbit step finish so its greeting reaches the top-center stop.

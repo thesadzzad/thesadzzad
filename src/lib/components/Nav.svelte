@@ -2,6 +2,11 @@
 	import { animate } from 'animejs';
 
 	let menuOpen = $state(false);
+	let {
+		hasSong,
+		muted,
+		onToggleMute
+	}: { hasSong: boolean; muted: boolean; onToggleMute: () => void } = $props();
 	let topBar = $state<HTMLSpanElement>();
 	let middleBar = $state<HTMLSpanElement>();
 	let bottomBar = $state<HTMLSpanElement>();
@@ -30,22 +35,57 @@
 		<a
 			class="grid size-10 shrink-0 place-items-center rounded-full bg-coral text-[22px] leading-none text-[#fffaf2] outline-offset-4 focus-visible:outline-2 focus-visible:outline-coral max-[700px]:size-9 max-[700px]:text-xl max-[360px]:size-8 max-[360px]:text-lg"
 			href="#home"
-			aria-label="Home"
-		><span aria-hidden="true">✳</span></a>
-		<button
-			class="flex size-10 items-center justify-center rounded-xl text-paper transition-colors duration-150 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-coral focus-visible:outline-offset-2 motion-reduce:transition-none"
-			type="button"
-			aria-expanded={menuOpen}
-			aria-controls="site-menu"
-			aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-			onclick={toggleMenu}
+			aria-label="Home"><span aria-hidden="true">✳</span></a
 		>
-			<span class="relative size-6" aria-hidden="true">
-				<span class="absolute left-1/2 top-[6px] h-[2px] w-[18px] -translate-x-1/2 rounded-full bg-current" bind:this={topBar}></span>
-				<span class="absolute left-1/2 top-[12px] h-[2px] w-[18px] -translate-x-1/2 rounded-full bg-current" bind:this={middleBar}></span>
-				<span class="absolute left-1/2 top-[18px] h-[2px] w-[18px] -translate-x-1/2 rounded-full bg-current" bind:this={bottomBar}></span>
-			</span>
-		</button>
+		<div class="ml-auto flex items-center gap-2">
+			{#if hasSong}
+				<button
+					class="flex size-10 items-center justify-center rounded-xl text-paper transition-colors duration-150 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral motion-reduce:transition-none max-[700px]:size-9"
+					type="button"
+					aria-label={muted ? 'Unmute intro song' : 'Mute intro song'}
+					title={muted ? 'Unmute intro song' : 'Mute intro song'}
+					onclick={onToggleMute}
+				>
+					<span class="relative flex h-4 items-center gap-[3px]" aria-hidden="true">
+						{#each [5, 11, 7, 14, 8] as height, index}
+							<span
+								class="music-bar w-[2px] rounded-full bg-current"
+								class:is-playing={!muted}
+								style={`--bar-height:${height}px;--bar-index:${index}`}
+							></span>
+						{/each}
+						{#if muted}
+							<span
+								class="absolute top-1/2 left-1/2 h-5 w-px -translate-x-1/2 -translate-y-1/2 rotate-45 bg-current"
+							></span>
+						{/if}
+					</span>
+				</button>
+			{/if}
+			<button
+				class="flex size-10 items-center justify-center rounded-xl text-paper transition-colors duration-150 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral motion-reduce:transition-none"
+				type="button"
+				aria-expanded={menuOpen}
+				aria-controls="site-menu"
+				aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+				onclick={toggleMenu}
+			>
+				<span class="relative size-6" aria-hidden="true">
+					<span
+						class="absolute top-[6px] left-1/2 h-[2px] w-[18px] -translate-x-1/2 rounded-full bg-current"
+						bind:this={topBar}
+					></span>
+					<span
+						class="absolute top-[12px] left-1/2 h-[2px] w-[18px] -translate-x-1/2 rounded-full bg-current"
+						bind:this={middleBar}
+					></span>
+					<span
+						class="absolute top-[18px] left-1/2 h-[2px] w-[18px] -translate-x-1/2 rounded-full bg-current"
+						bind:this={bottomBar}
+					></span>
+				</span>
+			</button>
+		</div>
 	</div>
 
 	<div
@@ -56,11 +96,62 @@
 	>
 		<div class="min-h-0 overflow-hidden">
 			<div class="border-t border-white/10 pt-1 pb-4">
-				<a class="block rounded-lg px-4 py-3 text-sm text-paper transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-coral" href="#home" onclick={() => setMenu(false)}>Home</a>
-				<a class="block rounded-lg px-4 py-3 text-sm text-paper transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-coral" href="#about" onclick={() => setMenu(false)}>About</a>
-				<a class="block rounded-lg px-4 py-3 text-sm text-paper transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-coral" href="#works" onclick={() => setMenu(false)}>Works</a>
-				<a class="block rounded-lg px-4 py-3 text-sm font-semibold text-coral transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-coral" href="#contact" onclick={() => setMenu(false)}>Let’s talk <span aria-hidden="true">↗</span></a>
+				<a
+					class="block rounded-lg px-4 py-3 text-sm text-paper transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-coral"
+					href="#home"
+					onclick={() => setMenu(false)}>Home</a
+				>
+				<a
+					class="block rounded-lg px-4 py-3 text-sm text-paper transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-coral"
+					href="#about"
+					onclick={() => setMenu(false)}>About</a
+				>
+				<a
+					class="block rounded-lg px-4 py-3 text-sm text-paper transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-coral"
+					href="#works"
+					onclick={() => setMenu(false)}>Works</a
+				>
+				<a
+					class="block rounded-lg px-4 py-3 text-sm font-semibold text-coral transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-coral"
+					href="#contact"
+					onclick={() => setMenu(false)}>Let’s talk <span aria-hidden="true">↗</span></a
+				>
+				<p class="px-4 pt-2 font-mono text-[9px] text-paper/50">
+					Audio control inspired by <a
+						class="underline underline-offset-2"
+						href="https://skiper-ui.com/v1/skiper25"
+						target="_blank"
+						rel="noreferrer">Skiper UI</a
+					>
+				</p>
 			</div>
 		</div>
 	</div>
 </nav>
+
+<style>
+	.music-bar {
+		height: var(--bar-height);
+		transform-origin: center;
+	}
+
+	.music-bar.is-playing {
+		animation: waveform 560ms ease-in-out infinite alternate;
+		animation-delay: calc(var(--bar-index) * -90ms);
+	}
+
+	@keyframes waveform {
+		from {
+			transform: scaleY(0.28);
+		}
+		to {
+			transform: scaleY(1);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.music-bar.is-playing {
+			animation: none;
+		}
+	}
+</style>
