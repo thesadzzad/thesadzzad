@@ -6,25 +6,25 @@
 		{
 			title: 'Pallora',
 			year: '2026',
-			image: 'https://thesadzzad.vercel.app/_next/image?url=%2Fpallora.webp&w=1600&q=75',
+			image: '/project-placeholder.svg',
 			href: 'https://palora-eight.vercel.app/'
 		},
 		{
 			title: 'AllCloths',
 			year: '2026',
-			image: 'https://thesadzzad.vercel.app/_next/image?url=%2Fallcloths.webp&w=1600&q=75',
+			image: '/project-placeholder.svg',
 			href: 'https://www.allcloths.com/'
 		},
 		{
 			title: 'Maplelingua',
 			year: '2026',
-			image: 'https://thesadzzad.vercel.app/_next/image?url=%2Fmaplelingua.webp&w=1600&q=75',
+			image: '/project-placeholder.svg',
 			href: 'https://www.maplelingua.com/'
 		},
 		{
 			title: 'Malyam',
 			year: '2026',
-			image: 'https://thesadzzad.vercel.app/_next/image?url=%2Fmalyam.webp&w=1600&q=75',
+			image: '/project-placeholder.svg',
 			href: 'https://malyam.com/'
 		},
 		{
