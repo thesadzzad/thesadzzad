@@ -1,5 +1,6 @@
 <script lang="ts">
 	import DynamicIsland from '$lib/components/DynamicIsland.svelte';
+	import FeaturedProjects from '$lib/components/FeaturedProjects.svelte';
 	import Intro from '$lib/components/Intro.svelte';
 	import Nav from '$lib/components/Nav.svelte';
 	import WordRotation from '$lib/components/WordRotation.svelte';
@@ -33,5 +34,6 @@
 	{/if}
 	{#if islandComplete}
 		<WordRotation />
+		<FeaturedProjects />
 	{/if}
 </main>

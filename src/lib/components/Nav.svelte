@@ -47,18 +47,17 @@
 					onclick={onToggleMute}
 				>
 					<span class="relative flex h-4 items-center gap-[3px]" aria-hidden="true">
-						{#each [5, 11, 7, 14, 8] as height, index}
+						{#each [5, 11, 7, 14, 8] as height, index (height)}
 							<span
 								class="music-bar w-[2px] rounded-full bg-current"
 								class:is-playing={!muted}
 								style={`--bar-height:${height}px;--bar-index:${index}`}
 							></span>
 						{/each}
-						{#if muted}
-							<span
-								class="absolute top-1/2 left-1/2 h-5 w-px -translate-x-1/2 -translate-y-1/2 rotate-45 bg-current"
-							></span>
-						{/if}
+						<span
+							class="mute-slash absolute top-1/2 left-1/2 h-[2px] w-5 rounded-full bg-current"
+							class:is-muted={muted}
+						></span>
 					</span>
 				</button>
 			{/if}
@@ -133,11 +132,26 @@
 	.music-bar {
 		height: var(--bar-height);
 		transform-origin: center;
+		animation: waveform 560ms ease-in-out infinite alternate;
+		animation-delay: calc(var(--bar-index) * -90ms);
+		animation-play-state: paused;
 	}
 
 	.music-bar.is-playing {
-		animation: waveform 560ms ease-in-out infinite alternate;
-		animation-delay: calc(var(--bar-index) * -90ms);
+		animation-play-state: running;
+	}
+
+	.mute-slash {
+		opacity: 0;
+		transform: translate(-50%, -50%) rotate(-45deg) scaleY(0.5);
+		transition:
+			opacity 180ms ease,
+			transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+
+	.mute-slash.is-muted {
+		opacity: 1;
+		transform: translate(-50%, -50%) rotate(0deg) scaleY(1);
 	}
 
 	@keyframes waveform {
@@ -150,8 +164,13 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
+		.music-bar,
 		.music-bar.is-playing {
 			animation: none;
+		}
+
+		.mute-slash {
+			transition: none;
 		}
 	}
 </style>

@@ -81,4 +81,31 @@
 		</span>
 	</h1>
 	<a class="absolute bottom-3 left-3 font-mono text-[9px] tracking-wide text-muted/70" href="https://sketchfab.com/3d-models/shuba-duck-54a6276ce06c4cc88fd497c8f1b8eb66" target="_blank" rel="noreferrer">Shuba Duck by Liron · CC BY 4.0</a>
+	<div class="scroll-cue absolute bottom-[8svh] left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-[11px] font-medium tracking-[0.14em] text-ink" aria-hidden="true">
+		<span>Scroll down</span>
+		<span class="scroll-cue-arrow"></span>
+	</div>
 </section>
+
+<style>
+	.scroll-cue-arrow {
+		width: 7px;
+		height: 7px;
+		border-right: 1px solid currentColor;
+		border-bottom: 1px solid currentColor;
+		transform: rotate(45deg);
+		animation: scroll-cue 1.2s ease-in-out infinite;
+	}
+
+	@keyframes scroll-cue {
+		50% {
+			translate: 0 3px;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.scroll-cue-arrow {
+			animation: none;
+		}
+	}
+</style>

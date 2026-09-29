@@ -2,6 +2,7 @@
 	import { animate } from 'animejs';
 	import { addCorners, unobserve } from '@monokai/monoco';
 	import { onMount } from 'svelte';
+	import { loadShubaDuck } from '$lib/shubaDuck';
 
 	let {
 		onComplete,
@@ -16,10 +17,10 @@
 	let orbit = $state<SVGSVGElement>();
 	let continueButton = $state<HTMLButtonElement>();
 	let continueLabel = $state<HTMLSpanElement>();
+	let loading = $state(false);
 	let exiting = $state(false);
 	let orbitAnimation: ReturnType<typeof animate> | undefined;
 	let labelAnimation: ReturnType<typeof animate> | undefined;
-	let centerGreeting = $state('');
 
 	function squircle(node: HTMLElement) {
 		addCorners(node, { borderRadius: 16, smoothing: 1, clip: true });
@@ -27,17 +28,22 @@
 	}
 
 	async function continueToHome() {
-		if (exiting) return;
-		exiting = true;
+		if (exiting || loading) return;
+		loading = true;
 		const introSong = new Audio('/intro_song.mp3');
 		introSong.volume = 0;
 		onSongStart(introSong);
 		void introSong.play().catch(() => {});
 		animate(introSong, { volume: 0.7, duration: 3000, ease: 'inCubic' });
+		try {
+			await Promise.all([loadShubaDuck(), document.fonts.ready]);
+		} catch {
+			// Continue to the landing page even if the model or its assets fail to load.
+		}
 		// Let the current orbit step finish so its greeting reaches the top-center stop.
 		await orbitAnimation?.then();
-		labelAnimation?.pause();
 		await new Promise((resolve) => setTimeout(resolve, 500));
+		exiting = true;
 		await Promise.all([
 			animate(curtain!, {
 				translateY: -window.innerHeight * 1.25,
@@ -68,13 +74,13 @@
 
 		async function play() {
 			await new Promise((resolve) => setTimeout(resolve, 500));
-			if (exiting) return;
+			if (exiting || loading) return;
 			const textPaths = orbitElement.querySelectorAll('textPath');
 			const progress = { offset: 0 };
 			let step = 0;
 
-			while (!exiting) {
-				if (exiting) return;
+			while (!exiting && !loading) {
+				if (exiting || loading) return;
 				step++;
 				orbitAnimation = animate(progress, {
 					offset: step * orbitStep,
@@ -88,7 +94,7 @@
 					}
 				});
 				await orbitAnimation.then();
-				if (exiting) return;
+				if (exiting || loading) return;
 				labelAnimation = animate(continueLabel!, {
 					translateY: '-120%',
 					opacity: 0,
@@ -96,7 +102,7 @@
 					ease: 'inQuad'
 				});
 				await labelAnimation.then();
-				if (exiting) return;
+				if (exiting || loading) return;
 				continueLabel!.textContent = continueWords[(step - 1) % continueWords.length];
 				labelAnimation = animate(continueLabel!, {
 					translateY: ['120%', '0%'],
@@ -131,13 +137,14 @@
 			<svg
 				bind:this={orbit}
 				class="absolute inset-0 size-full [transform-origin:center] overflow-visible [transform-box:fill-box]"
+				class:invisible={loading}
 				viewBox="0 0 1500 1000"
 				aria-hidden="true"
 			>
 				<defs>
 					<path id="intro-orbit" d="M 750 1000 A 750 500 0 0 1 750 0 A 750 500 0 0 1 750 1000" />
 				</defs>
-				{#each greetings as word, index}
+				{#each greetings as word, index (word)}
 					<text
 						fill="#282921"
 						font-family="DM Sans, sans-serif"
@@ -159,14 +166,28 @@
 			use:squircle
 			type="button"
 			onclick={continueToHome}
-			disabled={exiting}
-			aria-label="Continue to home"
+			disabled={exiting || loading}
+			aria-busy={loading}
+			aria-label={loading ? 'Loading landing assets' : 'Continue to home'}
 			class="intro-continue absolute bottom-[9svh] left-1/2 grid h-[60px] w-[164px] -translate-x-1/2 place-items-center bg-[#282921] px-6 text-[#f1ede4] shadow-[0_8px_30px_rgba(40,41,33,.14)] transition-colors hover:bg-[#df7554] hover:text-[#282921] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#282921] disabled:pointer-events-none"
 		>
 			<span class="relative block h-[1.2em] w-full overflow-hidden text-center" aria-hidden="true">
-				<span bind:this={continueLabel} class="continue-label block">Continue</span>
+				{#if !loading}
+					<span bind:this={continueLabel} class="continue-label block">Continue</span>
+				{/if}
+				{#if loading}
+					<span class="absolute inset-0 flex items-center justify-center gap-2">
+						<span
+							class="intro-spinner size-3 rounded-full border border-current border-t-transparent"
+						></span>
+						Loading
+					</span>
+				{/if}
 			</span>
 		</button>
+		<span class="sr-only" role="status" aria-live="polite"
+			>{loading ? 'Loading landing assets' : ''}</span
+		>
 	</div>
 {/if}
 
@@ -176,5 +197,21 @@
 		font-weight: 600;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
+	}
+
+	.intro-spinner {
+		animation: spin 700ms linear infinite;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.intro-spinner {
+			animation: none;
+		}
 	}
 </style>

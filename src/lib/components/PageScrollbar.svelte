@@ -72,7 +72,7 @@
 </script>
 
 {#if maxScroll > 0}
-	<div class="fixed top-1/2 right-[calc(2rem-157px)] z-50 hidden h-10 w-[min(314px,calc(100vw-32px))] -translate-y-1/2 rotate-90 rounded-full bg-white shadow-[0_4px_18px_rgb(40_41_33_/_12%)] md:block">
+	<div class="page-scrollbar fixed top-1/2 right-[calc(2rem-157px)] z-50 hidden h-10 w-[min(314px,calc(100vw-32px))] -translate-y-1/2 rotate-90 rounded-full bg-white shadow-[0_4px_18px_rgb(40_41_33_/_12%)] md:block">
 		<div
 			class="pointer-events-none absolute top-[13px] right-5 bottom-[13px] left-8 bg-[repeating-linear-gradient(90deg,#a8a79f_0_1px,transparent_1px_6px)]"
 			aria-hidden="true"
@@ -91,6 +91,27 @@
 {/if}
 
 <style>
+	.page-scrollbar {
+		animation: slide-in 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+	}
+
+	@keyframes slide-in {
+		from {
+			translate: 120% 0;
+			opacity: 0;
+		}
+		to {
+			translate: 0 0;
+			opacity: 1;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.page-scrollbar {
+			animation: none;
+		}
+	}
+
 	.page-scroll-range::-webkit-slider-runnable-track {
 		height: 24px;
 		background: transparent;

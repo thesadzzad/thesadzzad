@@ -53,15 +53,15 @@
 </script>
 
 
-<div class="fixed left-1/2 top-5 z-10 w-max max-w-[calc(100vw-24px)] -translate-x-1/2 drop-shadow-[0_10px_24px_rgb(40_41_33_/_16%)]">
+<div class="fixed left-1/2 top-5 z-10 w-max max-w-[calc(100vw-24px)] -translate-x-1/2 drop-shadow-[0_10px_24px_rgb(40_41_33/16%)]">
 	<div
-		class="relative grid min-h-[68px] w-max max-w-full place-items-center overflow-visible bg-ink text-paper max-[700px]:min-h-[56px]"
+		class="relative grid min-h-17 w-max max-w-full place-items-center overflow-visible bg-ink text-paper max-[700px]:min-h-14"
 		style:width={islandWidth ? `${islandWidth}px` : undefined}
 		bind:this={island}
 		use:squircle
 	>
 		{#if !showNav}
-			<div class="relative grid min-h-[68px] w-[144px] shrink-0 place-items-center px-6 font-medium tracking-wide max-[700px]:min-h-[56px]" bind:this={greeting}>
+			<div class="relative grid min-h-17 w-36 shrink-0 place-items-center px-6 font-medium tracking-wide max-[700px]:min-h-14" bind:this={greeting}>
 				Hello there
 			</div>
 		{/if}
