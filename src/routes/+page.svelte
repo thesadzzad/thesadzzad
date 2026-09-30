@@ -1,8 +1,5 @@
 <script lang="ts">
 	import DynamicIsland from '$lib/components/DynamicIsland.svelte';
-	import Footer from '$lib/components/Footer.svelte';
-	import FeaturedProjects from '$lib/components/FeaturedProjects.svelte';
-	import Intro from '$lib/components/Intro.svelte';
 	import Nav from '$lib/components/Nav.svelte';
 	import WordRotation from '$lib/components/WordRotation.svelte';
 	import type { PageData } from './$types';
@@ -32,22 +29,7 @@
 		}).replaceAll('<', '\\u003c')
 	);
 
-	let introComplete = $state(false);
 	let islandComplete = $state(false);
-	let introSong = $state<HTMLAudioElement>();
-	let songMuted = $state(false);
-
-	function toggleSongMute() {
-		songMuted = !songMuted;
-		if (introSong) introSong.muted = songMuted;
-	}
-
-	$effect(() => {
-		if (introComplete) return;
-		const previousOverflow = document.documentElement.style.overflow;
-		document.documentElement.style.overflow = 'hidden';
-		return () => (document.documentElement.style.overflow = previousOverflow);
-	});
 </script>
 
 <svelte:head>
@@ -68,15 +50,9 @@
 	{@html `<script type="application/ld+json">${personJsonLd}</script>`}
 </svelte:head>
 
-<Intro onComplete={() => (introComplete = true)} onSongStart={(song) => (introSong = song)} />
-
 <main id="home" class="relative min-h-svh w-full">
-	{#if introComplete}
-		<DynamicIsland onComplete={() => (islandComplete = true)}>
-			<Nav hasSong={Boolean(introSong)} muted={songMuted} onToggleMute={toggleSongMute} />
-		</DynamicIsland>
-	{/if}
+	<DynamicIsland onComplete={() => (islandComplete = true)}>
+		<Nav />
+	</DynamicIsland>
 	{#if islandComplete}<WordRotation />{/if}
-	<FeaturedProjects />
-	<Footer />
 </main>
