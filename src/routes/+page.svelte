@@ -1,6 +1,4 @@
 <script lang="ts">
-	import DynamicIsland from '$lib/components/DynamicIsland.svelte';
-	import Nav from '$lib/components/Nav.svelte';
 	import WordRotation from '$lib/components/WordRotation.svelte';
 	import type { PageData } from './$types';
 
@@ -29,7 +27,6 @@
 		}).replaceAll('<', '\\u003c')
 	);
 
-	let islandComplete = $state(false);
 </script>
 
 <svelte:head>
@@ -51,8 +48,10 @@
 </svelte:head>
 
 <main id="home" class="relative min-h-svh w-full">
+	<!--
 	<DynamicIsland onComplete={() => (islandComplete = true)}>
 		<Nav />
 	</DynamicIsland>
-	{#if islandComplete}<WordRotation />{/if}
+	-->
+	<WordRotation />
 </main>

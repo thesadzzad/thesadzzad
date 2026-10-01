@@ -2,11 +2,33 @@
 	import { animate } from 'animejs';
 	import { onMount } from 'svelte';
 	import type { AnimationMixer, Vector3, WebGLRenderer } from 'three';
-	import { loadShubaDuck } from '$lib/shubaDuck';
+	import { loadModel } from '$lib/models';
 
+	let {
+		modelPath,
+		modelName,
+		animationName,
+		trackPointer = false,
+		animationTrigger = 0
+	}: {
+		modelPath: string;
+		modelName: string;
+		animationName?: string;
+		trackPointer?: boolean;
+		animationTrigger?: number;
+	} = $props();
 	let canvas = $state<HTMLCanvasElement>();
 	let host = $state<HTMLDivElement>();
 	let failed = $state(false);
+	let playBigEye = $state<(() => void) | undefined>();
+	let handledAnimationTrigger = 0;
+
+	$effect(() => {
+		if (animationTrigger > handledAnimationTrigger && playBigEye) {
+			handledAnimationTrigger = animationTrigger;
+			playBigEye();
+		}
+	});
 
 	onMount(() => {
 		if (!canvas || !host) return;
@@ -14,7 +36,7 @@
 		let cleanup = () => {};
 
 		async function initialize() {
-			const { THREE, gltf } = await loadShubaDuck();
+			const { THREE, gltf } = await loadModel(modelPath);
 			if (disposed) return;
 
 			let renderer: WebGLRenderer;
@@ -49,8 +71,8 @@
 					const halfFov = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
 					camera.position.z =
 						Math.max(
-							(modelSize.y * modelScale * 0.5) / (halfFov * 0.86),
-							(modelSize.x * modelScale * 0.5) / (halfFov * camera.aspect * 0.86)
+							(modelSize.y * modelScale * 0.5) / (halfFov * 1),
+							(modelSize.x * modelScale * 0.5) / (halfFov * camera.aspect * 1)
 						) +
 						(modelSize.z * modelScale) / 2;
 				}
@@ -60,11 +82,14 @@
 			resizeObserver.observe(host!);
 			resize();
 
+			const modelRoot = new THREE.Group();
+			scene.add(modelRoot);
 			const pivot = new THREE.Group();
-			scene.add(pivot);
+			modelRoot.add(pivot);
 			const clock = new THREE.Clock();
 			const pointerTarget = new THREE.Vector3();
 			let mixer: AnimationMixer | undefined;
+			let bigEyeAction: ReturnType<AnimationMixer['clipAction']> | undefined;
 			let entranceAnimation: ReturnType<typeof animate> | undefined;
 			let liftAnimation: ReturnType<typeof animate> | undefined;
 			let frame = 0;
@@ -83,17 +108,20 @@
 			};
 
 			const onPointerMove = (event: PointerEvent) => {
-				if (reduceMotion) return;
-				const bounds = host!.getBoundingClientRect();
+				if (reduceMotion || event.pointerType !== 'mouse') return;
+				const bounds = trackPointer
+					? { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight }
+					: host!.getBoundingClientRect();
 				pointerTarget.set(
 					((event.clientX - bounds.left) / bounds.width - 0.5) * 0.55,
-					((event.clientY - bounds.top) / bounds.height - 0.5) * -0.25,
+					((event.clientY - bounds.top) / bounds.height - 0.5) * 0.25,
 					0
 				);
 			};
 			const onPointerLeave = () => pointerTarget.set(0, 0, 0);
-			host!.addEventListener('pointermove', onPointerMove);
-			host!.addEventListener('pointerleave', onPointerLeave);
+			const pointerElement = trackPointer ? window : host!;
+			pointerElement.addEventListener('pointermove', onPointerMove as EventListener);
+			pointerElement.addEventListener('pointerleave', onPointerLeave);
 
 			const bounds = new THREE.Box3().setFromObject(gltf.scene);
 			const center = bounds.getCenter(new THREE.Vector3());
@@ -106,23 +134,43 @@
 				-center.y * modelScale,
 				-center.z * modelScale
 			);
+			const head = trackPointer ? gltf.scene.getObjectByName('Head') : null;
+			if (head) {
+				gltf.scene.updateMatrixWorld(true);
+				const headPosition = head.getWorldPosition(new THREE.Vector3());
+				pivot.position.copy(headPosition);
+				gltf.scene.position.sub(headPosition);
+			}
 			pivot.add(gltf.scene);
 			resize();
 			if (!reduceMotion) {
-				pivot.position.y = -0.18;
-				pivot.scale.setScalar(0.82);
-				entranceAnimation = animate(pivot.scale, {
+				modelRoot.position.y = -0.18;
+				modelRoot.scale.setScalar(0.82);
+				entranceAnimation = animate(modelRoot.scale, {
 					x: 1,
 					y: 1,
 					z: 1,
 					duration: 850,
 					ease: 'outExpo'
 				});
-				liftAnimation = animate(pivot.position, { y: 0, duration: 850, ease: 'outExpo' });
+				liftAnimation = animate(modelRoot.position, { y: 0, duration: 850, ease: 'outExpo' });
 			}
 			if (!reduceMotion && gltf.animations.length) {
 				mixer = new THREE.AnimationMixer(gltf.scene);
-				mixer.clipAction(gltf.animations[0]).play();
+				const animation =
+					gltf.animations.find((clip) => clip.name === animationName) ?? gltf.animations[0];
+				mixer.clipAction(animation).play();
+				const bigEye = gltf.animations.find((clip) => clip.name === 'Big Eye');
+				if (bigEye) {
+					bigEyeAction = mixer.clipAction(bigEye);
+					playBigEye = () => {
+						mixer?.stopAllAction();
+						bigEyeAction!.reset();
+						bigEyeAction!.setLoop(THREE.LoopOnce, 1);
+						bigEyeAction!.clampWhenFinished = true;
+						bigEyeAction!.play();
+					};
+				}
 			}
 			void renderer.compileAsync(scene, camera).then(() => {
 				if (!disposed) {
@@ -136,9 +184,10 @@
 				entranceAnimation?.pause();
 				liftAnimation?.pause();
 				resizeObserver.disconnect();
-				host?.removeEventListener('pointermove', onPointerMove);
-				host?.removeEventListener('pointerleave', onPointerLeave);
+				pointerElement.removeEventListener('pointermove', onPointerMove as EventListener);
+				pointerElement.removeEventListener('pointerleave', onPointerLeave);
 				mixer?.stopAllAction();
+				playBigEye = undefined;
 				scene.traverse((object) => {
 					if (object instanceof THREE.Mesh) {
 						object.geometry.dispose();
@@ -172,11 +221,11 @@
 	});
 </script>
 
-<div bind:this={host} class="relative h-full w-full" aria-label="Animated 3D Shuba Duck">
+<div bind:this={host} class="relative h-full w-full" aria-label="Animated 3D {modelName}">
 	<canvas bind:this={canvas} class="block h-full w-full" aria-hidden="true"></canvas>
 	{#if failed}
 		<p class="absolute inset-0 grid place-items-center font-serif text-2xl text-muted">
-			Shuba Duck
+			{modelName}
 		</p>
 	{/if}
 </div>
